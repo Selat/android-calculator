@@ -8,13 +8,13 @@ public class CalculatorFiniteStateMachine extends PushdownAutomaton {
             public void call() {
                 displayedText += digit;
             }
-        });
+        }, StackOperationType.PUSH, "integer_part");
         addTransition(new TransitCondition("real_part", digit, "*"), "real_part", new TransitionCallback() {
             @Override
             public void call() {
                 displayedText += digit;
             }
-        });
+        }, StackOperationType.PUSH, "real_part");
     }
     private void addZeroDigitInput(final String digit) {
         addTransition(new TransitCondition("zero_integer_part", digit, "*"), "integer_part", new TransitionCallback() {
@@ -22,7 +22,7 @@ public class CalculatorFiniteStateMachine extends PushdownAutomaton {
             public void call() {
                 displayedText = digit;
             }
-        });
+        }, StackOperationType.PUSH, "zero_integer_part");
     }
     public CalculatorFiniteStateMachine() {
         super("zero_integer_part");
@@ -53,13 +53,45 @@ public class CalculatorFiniteStateMachine extends PushdownAutomaton {
             public void call() {
                 displayedText += ".";
             }
-        });
+        }, StackOperationType.PUSH, "zero_integer_part");
         addTransition(new TransitCondition("integer_part", ".", "*"), "real_part", new TransitionCallback() {
             @Override
             public void call() {
                 displayedText += ".";
             }
+        }, StackOperationType.PUSH, "integer_part");
+
+        // We don't want to pop something out of an empty stack
+        addTransition(new TransitCondition("zero_integer_part", "backspace", "*empty*"), "zero_integer_part", new TransitionCallback() {
+            @Override
+            public void call() {
+                displayedText = "0";
+            }
         });
+        addTransition(new TransitCondition("integer_part", "backspace", "zero_integer_part"), "zero_integer_part", new TransitionCallback() {
+            @Override
+            public void call() {
+                displayedText = "0";
+            }
+        }, StackOperationType.POP, null);
+        addTransition(new TransitCondition("integer_part", "backspace", "integer_part"), "integer_part", new TransitionCallback() {
+            @Override
+            public void call() {
+                displayedText = displayedText.substring(0, displayedText.length() - 1);
+            }
+        }, StackOperationType.POP, null);
+        addTransition(new TransitCondition("real_part", "backspace", "integer_part"), "integer_part", new TransitionCallback() {
+            @Override
+            public void call() {
+                displayedText = displayedText.substring(0, displayedText.length() - 1);
+            }
+        }, StackOperationType.POP, null);
+        addTransition(new TransitCondition("real_part", "backspace", "real_part"), "real_part", new TransitionCallback() {
+            @Override
+            public void call() {
+                displayedText = displayedText.substring(0, displayedText.length() - 1);
+            }
+        }, StackOperationType.POP, null);
     }
 
     public String getDisplayedText() {

@@ -55,5 +55,15 @@ public class MainActivity extends AppCompatActivity {
                 text.setText(calculator_fsm.getDisplayedText());
             }
         });
+        Button button_backspace = (Button)findViewById(R.id.button_backspace);
+        button_backspace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!calculator_fsm.transit("backspace")) {
+                    Toast.makeText(MainActivity.this, "Error occured", Toast.LENGTH_SHORT).show();
+                }
+                text.setText(calculator_fsm.getDisplayedText());
+            }
+        });
     }
 }

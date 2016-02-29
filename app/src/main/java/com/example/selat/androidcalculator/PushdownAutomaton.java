@@ -12,6 +12,7 @@ interface TransitionCallback {
 
 
 public class PushdownAutomaton {
+    enum StackOperationType {PUSH, POP, NOP};
     public class TransitCondition {
         public TransitCondition(String state, String inputSignal, String stackTop) {
             this.state = state;
@@ -62,7 +63,16 @@ public class PushdownAutomaton {
 
     public void addTransition(TransitCondition transitCondition, String to_state,
                               TransitionCallback callback) {
-        transitions.put(transitCondition, new Transition(to_state, callback));
+        transitions.put(transitCondition, new Transition(to_state, callback,
+                StackOperationType.NOP, null));
+    }
+
+    public void addTransition(TransitCondition transitCondition, String to_state,
+                              TransitionCallback callback,
+                              StackOperationType stackOperationType,
+                              String operand) {
+        transitions.put(transitCondition, new Transition(to_state, callback,
+                stackOperationType, operand));
     }
 
     private String getStackTop() {
@@ -79,6 +89,18 @@ public class PushdownAutomaton {
             Transition transition = transitions.get(tc);
             transition.callback.call();
             curState = transition.target_state;
+
+            switch (transition.stackOperationType) {
+                case NOP:
+                    break;
+                case PUSH:
+                    stack.push(transition.stackOperand);
+                    break;
+                case POP:
+                    stack.pop();
+                    break;
+            }
+
             return true;
         } else {
             return false;
@@ -86,12 +108,17 @@ public class PushdownAutomaton {
     }
 
     private class Transition {
-        public Transition(String target_state, TransitionCallback callback) {
+        public Transition(String target_state, TransitionCallback callback,
+                          StackOperationType stackOperationType, String stackOperand) {
             this.target_state = target_state;
             this.callback = callback;
+            this.stackOperationType = stackOperationType;
+            this.stackOperand = stackOperand;
         }
         public String target_state;
         public TransitionCallback callback;
+        public StackOperationType stackOperationType;
+        public String stackOperand;
     }
 
     private String curState;
