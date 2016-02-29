@@ -160,7 +160,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:text="@string/symbol_dot" />
+                        android:text="@string/symbol_dot"
+                        android:id="@+id/button_dot"/>
 
                     <Button
                         android:layout_width="match_parent"

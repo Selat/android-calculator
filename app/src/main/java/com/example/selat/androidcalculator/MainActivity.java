@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,8 +17,10 @@ public class MainActivity extends AppCompatActivity {
         button_digit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                calculator_fsm.transit(action);
-                text.setText(calculator_fsm.getDisplayed_text());
+                if (!calculator_fsm.transit(action)) {
+                    Toast.makeText(MainActivity.this, "Error occured", Toast.LENGTH_SHORT).show();
+                }
+                text.setText(calculator_fsm.getDisplayedText());
             }
         });
     }
@@ -30,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         calculator_fsm = new CalculatorFiniteStateMachine();
 
         text = (TextView)findViewById(R.id.text_view);
+        text.setText(calculator_fsm.getDisplayedText());
 
         addDigitButtonListener(R.id.button_digit_0, "0");
         addDigitButtonListener(R.id.button_digit_1, "1");
@@ -41,5 +45,15 @@ public class MainActivity extends AppCompatActivity {
         addDigitButtonListener(R.id.button_digit_7, "7");
         addDigitButtonListener(R.id.button_digit_8, "8");
         addDigitButtonListener(R.id.button_digit_9, "9");
+        Button button_dot = (Button)findViewById(R.id.button_dot);
+        button_dot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!calculator_fsm.transit(".")) {
+                    Toast.makeText(MainActivity.this, "Error occured", Toast.LENGTH_SHORT).show();
+                }
+                text.setText(calculator_fsm.getDisplayedText());
+            }
+        });
     }
 }

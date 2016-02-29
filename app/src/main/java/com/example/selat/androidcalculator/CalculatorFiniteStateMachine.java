@@ -1,18 +1,42 @@
 package com.example.selat.androidcalculator;
 
-public class CalculatorFiniteStateMachine extends FiniteStateMachine {
+public class CalculatorFiniteStateMachine extends PushdownAutomaton {
     private static final String TAG = "AndroidCalculator";
     private void addDigitInput(final String digit) {
-        addTransition("integer_part", "integer_part", digit, new TransitionCallback() {
+        addTransition(new TransitCondition("integer_part", digit, "*"), "integer_part", new TransitionCallback() {
             @Override
             public void call() {
-                displayed_text += digit;
+                displayedText += digit;
+            }
+        });
+        addTransition(new TransitCondition("real_part", digit, "*"), "real_part", new TransitionCallback() {
+            @Override
+            public void call() {
+                displayedText += digit;
+            }
+        });
+    }
+    private void addZeroDigitInput(final String digit) {
+        addTransition(new TransitCondition("zero_integer_part", digit, "*"), "integer_part", new TransitionCallback() {
+            @Override
+            public void call() {
+                displayedText = digit;
             }
         });
     }
     public CalculatorFiniteStateMachine() {
-        super("integer_part");
-        this.displayed_text = new String();
+        super("zero_integer_part");
+        this.displayedText = "0";
+
+        addZeroDigitInput("1");
+        addZeroDigitInput("2");
+        addZeroDigitInput("3");
+        addZeroDigitInput("4");
+        addZeroDigitInput("5");
+        addZeroDigitInput("6");
+        addZeroDigitInput("7");
+        addZeroDigitInput("8");
+        addZeroDigitInput("9");
         addDigitInput("0");
         addDigitInput("1");
         addDigitInput("2");
@@ -23,11 +47,24 @@ public class CalculatorFiniteStateMachine extends FiniteStateMachine {
         addDigitInput("7");
         addDigitInput("8");
         addDigitInput("9");
+
+        addTransition(new TransitCondition("zero_integer_part", ".", "*"), "real_part", new TransitionCallback() {
+            @Override
+            public void call() {
+                displayedText += ".";
+            }
+        });
+        addTransition(new TransitCondition("integer_part", ".", "*"), "real_part", new TransitionCallback() {
+            @Override
+            public void call() {
+                displayedText += ".";
+            }
+        });
     }
 
-    public String getDisplayed_text() {
-        return this.displayed_text;
+    public String getDisplayedText() {
+        return this.displayedText;
     }
 
-    private String displayed_text;
+    private String displayedText;
 }
