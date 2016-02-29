@@ -1,10 +1,6 @@
 package com.example.selat.androidcalculator;
 
-import android.support.annotation.NonNull;
-
-import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 interface TransitionCallback {
