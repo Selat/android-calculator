@@ -17,10 +17,35 @@ public class MainActivity extends AppCompatActivity {
         button_digit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (pendingOperator == null) {
+                    pendingArgument = null;
+                }
                 if (!calculator_fsm.transit(action)) {
                     Toast.makeText(MainActivity.this, "Error occured", Toast.LENGTH_SHORT).show();
                 }
                 text.setText(calculator_fsm.getDisplayedText());
+            }
+        });
+    }
+
+    private void addBinaryOperator(int id, final BinaryOperator operator) {
+        Button button_operator = (Button)findViewById(id);
+        button_operator.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pendingOperator == null) {
+                    pendingOperator = operator;
+                    pendingArgument = Double.parseDouble(calculator_fsm.getDisplayedText());
+                    calculator_fsm.setDisplayedText("0");
+                    calculator_fsm.restart();
+                } else {
+                    Double b = Double.parseDouble(calculator_fsm.getDisplayedText());
+                    pendingArgument = pendingOperator.apply(pendingArgument, b);
+                    pendingOperator = operator;
+                    calculator_fsm.setDisplayedText(Double.toString(pendingArgument));
+                    calculator_fsm.restart();
+                    text.setText(calculator_fsm.getDisplayedText());
+                }
             }
         });
     }
@@ -55,6 +80,17 @@ public class MainActivity extends AppCompatActivity {
                 text.setText(calculator_fsm.getDisplayedText());
             }
         });
+        Button buttonClear = (Button)findViewById(R.id.button_clear);
+        buttonClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calculator_fsm.setDisplayedText("0");
+                calculator_fsm.restart();
+                pendingOperator = null;
+                pendingArgument = null;
+                text.setText(calculator_fsm.getDisplayedText());
+            }
+        });
         Button button_backspace = (Button)findViewById(R.id.button_backspace);
         button_backspace.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,5 +101,47 @@ public class MainActivity extends AppCompatActivity {
                 text.setText(calculator_fsm.getDisplayedText());
             }
         });
+
+        addBinaryOperator(R.id.button_plus, new BinaryOperator() {
+            @Override
+            public Double apply(Double a, Double b) {
+                return a + b;
+            }
+        });
+        addBinaryOperator(R.id.button_minus, new BinaryOperator() {
+            @Override
+            public Double apply(Double a, Double b) {
+                return a - b;
+            }
+        });
+        addBinaryOperator(R.id.button_mul, new BinaryOperator() {
+            @Override
+            public Double apply(Double a, Double b) {
+                return a * b;
+            }
+        });
+        addBinaryOperator(R.id.button_div, new BinaryOperator() {
+            @Override
+            public Double apply(Double a, Double b) {
+                return a / b;
+            }
+        });
+
+        Button buttonEquals = (Button)findViewById(R.id.button_equals);
+        buttonEquals.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pendingOperator != null) {
+                    Double b = Double.parseDouble(calculator_fsm.getDisplayedText());
+                    Double res = pendingOperator.apply(pendingArgument, b);
+                    pendingOperator = null;
+                    calculator_fsm.setDisplayedText(res.toString());
+                    text.setText(calculator_fsm.getDisplayedText());
+                }
+            }
+        });
     }
+
+    private BinaryOperator pendingOperator;
+    private Double pendingArgument;
 }

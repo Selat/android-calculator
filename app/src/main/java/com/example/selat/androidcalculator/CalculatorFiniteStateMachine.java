@@ -1,5 +1,9 @@
 package com.example.selat.androidcalculator;
 
+interface BinaryOperator {
+    Double apply(Double a, Double b);
+}
+
 public class CalculatorFiniteStateMachine extends PushdownAutomaton {
     private static final String TAG = "AndroidCalculator";
     private void addDigitInput(final String digit) {
@@ -62,7 +66,7 @@ public class CalculatorFiniteStateMachine extends PushdownAutomaton {
         }, StackOperationType.PUSH, "integer_part");
 
         // We don't want to pop something out of an empty stack
-        addTransition(new TransitCondition("zero_integer_part", "backspace", "*empty*"), "zero_integer_part", new TransitionCallback() {
+        addTransition(new TransitCondition("zero_integer_part", "backspace", "*"), "zero_integer_part", new TransitionCallback() {
             @Override
             public void call() {
                 displayedText = "0";
@@ -96,6 +100,14 @@ public class CalculatorFiniteStateMachine extends PushdownAutomaton {
 
     public String getDisplayedText() {
         return this.displayedText;
+    }
+
+    public void setDisplayedText(String displayedText) {
+        this.displayedText = displayedText;
+    }
+
+    public void restart() {
+        restart(displayedText);
     }
 
     private String displayedText;

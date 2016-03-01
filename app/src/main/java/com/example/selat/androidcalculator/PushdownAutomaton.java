@@ -12,7 +12,7 @@ interface TransitionCallback {
 
 
 public class PushdownAutomaton {
-    enum StackOperationType {PUSH, POP, NOP};
+    enum StackOperationType {PUSH, POP, NOP}
     public class TransitCondition {
         public TransitCondition(String state, String inputSignal, String stackTop) {
             this.state = state;
@@ -55,10 +55,15 @@ public class PushdownAutomaton {
         private final String stackTop;
     }
 
-    public PushdownAutomaton(String start_state) {
+    public PushdownAutomaton(String startState) {
         this.transitions = new HashMap<>();
-        this.curState = start_state;
+        this.startState = startState;
+        this.curState = startState;
         this.stack = new Stack<>();
+    }
+
+    public void setCurrentState(String state) {
+        this.curState = state;
     }
 
     public void addTransition(TransitCondition transitCondition, String to_state,
@@ -87,7 +92,6 @@ public class PushdownAutomaton {
         TransitCondition tc = new TransitCondition(this.curState, action, getStackTop());
         if (transitions.containsKey(tc)) {
             Transition transition = transitions.get(tc);
-            transition.callback.call();
             curState = transition.target_state;
 
             switch (transition.stackOperationType) {
@@ -101,9 +105,20 @@ public class PushdownAutomaton {
                     break;
             }
 
+            transition.callback.call();
+
             return true;
         } else {
             return false;
+        }
+    }
+
+    // NOTE: Here we assume that each state id is just one symbol long
+    public void restart(String s) {
+        curState = startState;
+        stack.clear();
+        for (int i = 0; i < s.length(); ++i) {
+            transit(s.substring(i, i + 1));
         }
     }
 
@@ -121,7 +136,8 @@ public class PushdownAutomaton {
         public String stackOperand;
     }
 
-    private String curState;
-    private Map<TransitCondition, Transition> transitions;
-    private Stack<String> stack;
+    protected String curState;
+    protected String startState;
+    protected Map<TransitCondition, Transition> transitions;
+    protected Stack<String> stack;
 }
