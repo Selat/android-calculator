@@ -54,7 +54,26 @@ public class NumpadFragment extends Fragment {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.small_calculator, container, false);
         mTextLineAccessor = (TextLineAccessor)getActivity();
-        addDigitButtonListener(R.id.button_digit_0, "0");
+        Button button_0 = (Button)view.findViewById(R.id.button_digit_0);
+        button_0.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CharSequence text = mTextLineAccessor.getText();
+                int len = text.length();
+                if (mTextLineAccessor.isClearable()) {
+                    mTextLineAccessor.setText("0");
+                } else {
+                    int i = len - 1;
+                    while (i >= 0 && text.charAt(i) == '0') {
+                        --i;
+                    }
+                    if (i != -1 && (i == len - 1 || Character.isDigit(text.charAt(i)) || text.charAt(i) == '.')) {
+                        mTextLineAccessor.setText(mTextLineAccessor.getText() + "0");
+                    }
+                }
+                mTextLineAccessor.setIsClearable(false);
+            }
+        });
         addDigitButtonListener(R.id.button_digit_1, "1");
         addDigitButtonListener(R.id.button_digit_2, "2");
         addDigitButtonListener(R.id.button_digit_3, "3");
