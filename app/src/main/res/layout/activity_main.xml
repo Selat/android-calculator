@@ -12,17 +12,28 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:id="@+id/mainlayout"
+        android:tag="portrait">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="3"
+            android:textAlignment="viewEnd"
+            android:layout_gravity="end"
+            android:textSize="20pt"
             android:id="@+id/text_view"/>
 
-        <include android:layout_weight="1"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            layout="@layout/small_calculator"/>
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <fragment android:name="com.example.selat.androidcalculator.NumpadFragment"
+            android:id="@+id/numpad_fragment"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </LinearLayout>
 </RelativeLayout>

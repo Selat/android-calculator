@@ -18,4 +18,18 @@
     <string name="operator_div">/</string>
     <string name="backspace">⌫</string>
     <string name="clear">Clear</string>
+    <string name="sin">sin</string>
+    <string name="cos">cos</string>
+    <string name="tan">tan</string>
+    <string name="ctn">ctn</string>
+    <string name="pi">π</string>
+    <string name="e">e</string>
+    <string name="inverse">x⁻¹</string>
+    <string name="abs">|x|</string>
+    <string name="ln">ln</string>
+    <string name="log">log</string>
+    <string name="sqrt">√</string>
+    <string name="xtoy">xʸ</string>
+    <string name="leftp">(</string>
+    <string name="rightp">)</string>
 </resources>
