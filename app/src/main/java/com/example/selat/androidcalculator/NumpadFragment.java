@@ -6,11 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
-/**
- * Created by selat on 3/22/16.
- */
 public class NumpadFragment extends Fragment {
 
     private void addDigitButtonListener(int id, final String action) {
@@ -92,6 +88,13 @@ public class NumpadFragment extends Fragment {
             public void onClick(View v) {
                 mTextLineAccessor.setText("0");
                 mTextLineAccessor.setIsClearable(true);
+            }
+        });
+        Button buttonSettings = (Button)view.findViewById(R.id.button_settings);
+        buttonSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+        public void onClick(View v) {
+                mTextLineAccessor.updateSettings();
             }
         });
         Button button_backspace = (Button)view.findViewById(R.id.button_backspace);

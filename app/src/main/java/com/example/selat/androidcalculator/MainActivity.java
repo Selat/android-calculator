@@ -1,5 +1,9 @@
 package com.example.selat.androidcalculator;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.media.audiofx.BassBoost;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 
 public class MainActivity extends AppCompatActivity
 implements TextLineAccessor {
@@ -25,6 +30,13 @@ implements TextLineAccessor {
 
     @Override
     public void evalAndUpdate() {
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+        String precision = SP.getString("precision_list", "NA");
+        Integer val = Integer.parseInt(precision);
+        if (val != null) {
+            df.setMaximumFractionDigits(val);
+        }
         text.setText(df.format(evalExpression(text.getText().toString())));
     }
 
@@ -43,10 +55,11 @@ implements TextLineAccessor {
         text.append(s);
     }
 
-    private CalculatorFiniteStateMachine calculator_fsm;
-    private TextView text;
-
-    DecimalFormat df;
+    @Override
+    public void updateSettings() {
+        Intent i = new Intent(this, SettingsActivity.class);
+        startActivity(i);
+    }
 
     private void addTextButton(int id, final String name) {
         Button button_digit = (Button)findViewById(id);
@@ -70,7 +83,9 @@ implements TextLineAccessor {
 
         isClearable = true;
 
-        df = new DecimalFormat("#.##########");
+        DecimalFormatSymbols decimalSeparator = new DecimalFormatSymbols();
+        decimalSeparator.setDecimalSeparator('.');
+        df = new DecimalFormat("#.##########", decimalSeparator);
 
         //calculator_fsm = new CalculatorFiniteStateMachine();
 
@@ -117,5 +132,8 @@ implements TextLineAccessor {
     }
     public native double evalExpression(String s);
 
+
+    private TextView text;
+    DecimalFormat df;
     private boolean isClearable;
 }
