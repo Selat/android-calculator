@@ -1,6 +1,9 @@
 package com.example.selat.androidcalculator;
 
 import android.app.Fragment;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +20,7 @@ public class NumpadFragment extends Fragment {
                 if (mTextLineAccessor.isClearable()) {
                     mTextLineAccessor.setText(action);
                 } else {
-                    mTextLineAccessor.setText(mTextLineAccessor.getText() + action);
+                    mTextLineAccessor.append(action);
                 }
                 mTextLineAccessor.setIsClearable(false);
             }
@@ -39,11 +42,9 @@ public class NumpadFragment extends Fragment {
             public void onClick(View v) {
                 mTextLineAccessor.setIsClearable(false);
                 if (finishesWithOperator(mTextLineAccessor.getText())) {
-                    mTextLineAccessor.setText(mTextLineAccessor.getText().subSequence(0,
-                            mTextLineAccessor.getText().length() - 1) + op_name);
-                } else {
-                    mTextLineAccessor.append(op_name);
+                    mTextLineAccessor.popBack();
                 }
+                mTextLineAccessor.append(op_name);
             }
         });
     }
@@ -61,14 +62,14 @@ public class NumpadFragment extends Fragment {
                 CharSequence text = mTextLineAccessor.getText();
                 int len = text.length();
                 if (mTextLineAccessor.isClearable()) {
-                    mTextLineAccessor.setText("0");
+                    mTextLineAccessor.clearData();
                 } else {
                     int i = len - 1;
                     while (i >= 0 && text.charAt(i) == '0') {
                         --i;
                     }
                     if (i != -1 && (i == len - 1 || Character.isDigit(text.charAt(i)) || text.charAt(i) == '.')) {
-                        mTextLineAccessor.setText(mTextLineAccessor.getText() + "0");
+                        mTextLineAccessor.append("0");
                     }
                 }
                 mTextLineAccessor.setIsClearable(false);
@@ -88,7 +89,8 @@ public class NumpadFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (mTextLineAccessor.isClearable()) {
-                    mTextLineAccessor.setText("0.");
+                    mTextLineAccessor.clearData();
+                    mTextLineAccessor.append(".");
                     mTextLineAccessor.setIsClearable(false);
                 } else if (Character.isDigit(mTextLineAccessor.getText().charAt(
                         mTextLineAccessor.getText().length() - 1))) {
@@ -105,28 +107,30 @@ public class NumpadFragment extends Fragment {
         buttonClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mTextLineAccessor.setText("0");
-                mTextLineAccessor.setIsClearable(true);
+                mTextLineAccessor.clearData();
             }
         });
         Button buttonSettings = (Button)view.findViewById(R.id.button_settings);
         buttonSettings.setOnClickListener(new View.OnClickListener() {
             @Override
-        public void onClick(View v) {
+            public void onClick(View v) {
                 mTextLineAccessor.updateSettings();
+            }
+        });
+        Button buttonHelp = (Button)view.findViewById(R.id.button_help);
+        buttonHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Selat/android-calculator"));
+                intent.setComponent(new ComponentName("org.mozilla.firefox", "org.mozilla.firefox.App"));
+                getActivity().startActivity(intent);
             }
         });
         Button button_backspace = (Button)view.findViewById(R.id.button_backspace);
         button_backspace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mTextLineAccessor.getText().length() > 1) {
-                    mTextLineAccessor.setText(mTextLineAccessor.getText().subSequence(0,
-                            mTextLineAccessor.getText().length() - 1));
-                } else {
-                    mTextLineAccessor.setText("0");
-                    mTextLineAccessor.setIsClearable(true);
-                }
+                mTextLineAccessor.popBack();
             }
         });
 

@@ -5,7 +5,9 @@ public interface TextLineAccessor {
     void setIsClearable(boolean value);
     CharSequence getText();
     void updateSettings();
-    void setText(CharSequence s);
+    void popBack();
+    void setText(CharSequence t);
+    void clearData();
     void append(CharSequence s);
     void evalAndUpdate();
 }

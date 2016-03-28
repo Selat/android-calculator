@@ -1,12 +1,15 @@
 package com.example.selat.androidcalculator;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.audiofx.BassBoost;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,8 +17,9 @@ import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Stack;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends Activity
 implements TextLineAccessor {
 
     @Override
@@ -32,12 +36,17 @@ implements TextLineAccessor {
     public void evalAndUpdate() {
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-        String precision = SP.getString("precision_list", "NA");
+        String precision = SP.getString("precision_list", "5");
         Integer val = Integer.parseInt(precision);
         if (val != null) {
             df.setMaximumFractionDigits(val);
         }
-        text.setText(df.format(evalExpression(text.getText().toString())));
+        String s = df.format(evalExpression(text.getText().toString()));
+        clearData();
+        setText(s.substring(0, 1));
+        for (int i = 1; i < s.length(); ++i) {
+            append(s.substring(i, i + 1));
+        }
     }
 
     @Override
@@ -46,13 +55,33 @@ implements TextLineAccessor {
     }
 
     @Override
-    public void setText(CharSequence s) {
-        text.setText(s);
+    public void clearData() {
+        isClearable = true;
+        text.setText("0");
+        lexem_ids.push(text.length());
+    }
+
+    @Override
+    public void popBack() {
+        if (lexem_ids.size() == 1) {
+            clearData();
+        } else {
+            int l = lexem_ids.pop();
+            text.setText(text.getText().subSequence(0, l));
+        }
     }
 
     @Override
     public void append(CharSequence s) {
+        lexem_ids.push(text.length());
         text.append(s);
+    }
+
+    @Override
+    public void setText(CharSequence t) {
+        lexem_ids.clear();
+        lexem_ids.push(1);
+        text.setText(t);
     }
 
     @Override
@@ -67,10 +96,10 @@ implements TextLineAccessor {
             @Override
             public void onClick(View v) {
                 if (isClearable) {
-                    text.setText(name);
+                    setText(name);
                     isClearable = false;
                 } else {
-                    text.append(name);
+                    append(name);
                 }
             }
         });
@@ -81,16 +110,13 @@ implements TextLineAccessor {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        isClearable = true;
+        lexem_ids = new Stack<Integer>();
 
         DecimalFormatSymbols decimalSeparator = new DecimalFormatSymbols();
         decimalSeparator.setDecimalSeparator('.');
         df = new DecimalFormat("#.##########", decimalSeparator);
-
-        //calculator_fsm = new CalculatorFiniteStateMachine();
-
         text = (TextView)findViewById(R.id.text_view);
-        text.setText("0");
+        clearData();
 
         LinearLayout mainlayout = (LinearLayout)findViewById(R.id.mainlayout);
         if (mainlayout.getTag().equals("landscape")) {
@@ -132,7 +158,7 @@ implements TextLineAccessor {
     }
     public native double evalExpression(String s);
 
-
+    static Stack<Integer> lexem_ids;
     private TextView text;
     DecimalFormat df;
     private boolean isClearable;
